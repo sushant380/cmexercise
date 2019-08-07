@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node src/app.js",
+    "test": "node node_modules/mocha/bin/_mocha ./test"
   },
   "dependencies": {
     "@google-cloud/datastore": "^4.1.4",
@@ -13,5 +14,11 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^6.2.0",
+    "sinon": "^7.4.1"
   }
 }
