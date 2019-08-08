@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 chai.should();
 let app;
 describe('Test APIs', () => {
-  const customer = { id: 10, name: 'sushanttest', country: 'sweden' };
+  const customer = { id: 10, name: 'sushanttest', country: 'Sweden' };
   before(() => {
     sinon.stub(CustomerStore, 'uploaddata').callsFake((data, callback) => {
       callback(null);
@@ -15,12 +15,23 @@ describe('Test APIs', () => {
     sinon
       .stub(CustomerStore, 'getall')
       .callsFake((data1, data2, data3, callback) => {
-        callback(null, [customer], 'sometoken');
+        if (data1.length > 0) {
+          if (data1[0].field === 'country' && data1[0].value === 'Sweden') {
+            callback(null, [customer], 'sometoken');
+          }
+          if (data1[0].field === 'country' && data1[0].value === 'Norway') {
+            callback(null, [], 'sometoken');
+          }
+        } else {
+          callback(null, [customer], 'sometoken');
+        }
       });
     sinon.stub(CustomerStore, 'get').callsFake((data1, callback) => {
       if (parseInt(data1, 10) === 1) {
         callback(null, customer);
-      } else {
+      } else if (data1 === '2') {
+        callback('404', null);
+      } else if (data1 === '3') {
         callback('some error', null);
       }
     });
@@ -35,6 +46,29 @@ describe('Test APIs', () => {
         res.should.have.status(200);
         res.body.should.have.property('customers');
         res.body.should.have.property('pageToken');
+        done();
+      });
+  });
+  it('should return filtered customers', done => {
+    chai
+      .request(app)
+      .get('/customers?country=Sweden')
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.have.property('customers');
+        done();
+      });
+  });
+  it('should return empty array after filteration', done => {
+    chai
+      .request(app)
+      .get('/customers?country=Norway')
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.have
+          .property('customers')
+          .to.be.an('array')
+          .that.eql([]);
         done();
       });
   });
@@ -54,6 +88,15 @@ describe('Test APIs', () => {
       .get('/customers/2')
       .end((err, res) => {
         res.should.have.status(404);
+        done();
+      });
+  });
+  it('should return 505 for other errors', done => {
+    chai
+      .request(app)
+      .get('/customers/3')
+      .end((err, res) => {
+        res.should.have.status(500);
         done();
       });
   });

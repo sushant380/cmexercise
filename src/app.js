@@ -9,13 +9,11 @@ const app = express();
 initializeDb(db => {
   app.set('port', port);
 
-  // view engine setup
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use('/customers', customerRouter);
   app.use('/', (req, res) => {
-    // console.log(req);
     res.redirect('/customers');
   });
 
@@ -26,10 +24,6 @@ initializeDb(db => {
 
   // error handler
   app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
     // render the error page
     res.status(err.status || 500);
     res.render('error');
