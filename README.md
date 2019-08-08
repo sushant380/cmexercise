@@ -50,8 +50,8 @@ The server is now running on `http://{yourprojectid}.appspot.com`. You can send 
 #### `GET`
 
 - `/customers`: Fetch all customer entities stored in DB.
-- `/customers?name={nameString}&country={country}`: Fetch all customer entities stored in DB filtered by criteria passed in query parameters.
-- `/customers/:id`: Fetch customer entity by its `id`.
+- `/customers?name={nameString}&country={country}`: Fetch all customer entities stored in DB filtered by criteria passed in query parameters. e.g. `/customers?name=Sushant&country=Sweden`
+- `/customers/:id`: Fetch customer entity by its `id`. e.g. `/customers/1`
 
 ### 5. Test
 
