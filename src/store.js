@@ -57,6 +57,7 @@ const get = (id, callback) => {
     const customer = converted.length ? converted[0] : null;
     if (!customer) {
       callback('404');
+      return;
     }
     callback(null, customer);
   });

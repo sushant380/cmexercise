@@ -22,7 +22,8 @@ router.get('/', (req, res, next) => {
     req.query.pageToken,
     (err, customers, cursor) => {
       if (err) {
-        next(err);
+        res.sendStatus(500);
+        return;
       }
       res.json({ customers, pageToken: cursor });
     }
@@ -34,16 +35,17 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res) => {
   //Check if id is numeric. If not send bad request response.
   if (isNaN(req.params.id)) {
-    res.status(400).send('Bad request. Please check the ID');
+    res.sendStatus(400);
+    return;
   }
   customerStore.get(req.params.id, (err, customer) => {
     if (err === '404') {
       //if customer not found then send 404 response
-      res.status(404).send('Customer not found');
+      res.sendStatus(404);
       return;
     } else if (err) {
       //if error occurs while query to db, then send 500 response.
-      res.status(500).send('Something went wrong');
+      res.sendStatus(500);
       return;
     }
     res.json(customer);
