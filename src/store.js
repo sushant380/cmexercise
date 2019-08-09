@@ -5,23 +5,20 @@ const kind = 'Customer';
  * Convert db records to general format.
  * @param {*} row DB record.
  */
-const fromStore = row => {
-  const { id, name, age, country } = row;
-  return {
-    id,
-    name,
-    age,
-    country
-  };
-};
+const fromStore = ({ id, name, age, country }) => ({
+  id,
+  name,
+  age,
+  country
+});
 /**
  * Use query param to filter the results
  * @param {String} query
  * @param {Array} filters
  */
 const applyFilters = (query, filters) => {
-  filters.forEach(filter => {
-    query = query.filter(filter.field, filter.operator, filter.value);
+  filters.forEach(({ field, operator, value }) => {
+    query = query.filter(field, operator, value);
   });
   return query;
 };
