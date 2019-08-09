@@ -39,18 +39,9 @@ const getall = (filters, limit, token) => {
   return ds
     .runQuery(query)
     .then(result =>
-      Promise.resolve({ rows: result[0].map(fromStore), pageCursor: result[1] })
+      Promise.resolve({ rows: result[0].map(fromStore), pageToken: result[1] })
     )
     .catch(err => Promise.reject(err));
-  // ds.runQuery(query)
-  //   .then(({ rows, info }) => {
-  //     callback(
-  //       null,
-  //       rows.map(fromStore),
-  //       info.moreResults !== Datastore.NO_MORE_RESULTS ? info.endCursor : false
-  //     );
-  //   })
-  //   .catch(err => callback(err));
 };
 /**
  * Get customer from DB based on ID
