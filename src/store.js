@@ -60,27 +60,7 @@ const get = id => {
     .catch(err => Promise.reject(err));
 };
 
-const upload = (data, callback) => {
-  const key = ds.key('Customer');
-  const updated = data.map(record => {
-    record.key = key;
-    return record;
-  });
-  ds.save(updated, callback);
-};
-/**
- * Dummy data to be uploaded into DB for testing.
- * @param {Array} data data
- * @param {Function} callback call back to send response.
- */
-const uploaddata = (data, callback) => {
-  const query = ds.createQuery([kind]).limit(1);
-  ds.runQuery(query)
-    .then(result => result[0].length === 0 && upload(data, callback))
-    .catch(err => upload(data, callback));
-};
 module.exports = {
   getall,
-  get,
-  uploaddata
+  get
 };

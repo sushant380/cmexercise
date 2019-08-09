@@ -1,17 +1,14 @@
 process.env.NODE_ENV = 'test';
-var CustomerStore = require('../src/store');
+const CustomerStore = require('../src/store');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const sinon = require('sinon').createSandbox();
 chai.use(chaiHttp);
 chai.should();
-let app, getll, uploaddata, getmethod;
+let app;
 describe('Test APIs', () => {
   const customer = { id: 10, name: 'sushanttest', country: 'Sweden' };
   beforeEach(() => {
-    sinon.stub(CustomerStore, 'uploaddata').callsFake((data, callback) => {
-      callback(null);
-    });
     getll = sinon
       .stub(CustomerStore, 'getall')
       .callsFake((data1, data2, data3) => {
@@ -31,13 +28,11 @@ describe('Test APIs', () => {
         return Promise.resolve({ rows: [customer] });
       } else if (data1 === '2') {
         return Promise.reject('404');
-        // callback('404', null);
       } else if (data1 === '3') {
         return Promise.reject();
-        // callback('some error', null);
       }
     });
-    app = require('../src/app');
+    app = require('../app');
   });
   afterEach(() => {
     sinon.restore();
