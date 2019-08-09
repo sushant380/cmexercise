@@ -28,7 +28,9 @@ const handleError = (err, res) =>
  */
 
 const handleResponse = (res, customers, pageToken) => {
-  res.json({ customers, pageToken });
+  Array.isArray(customers)
+    ? res.json({ customers, pageToken })
+    : res.json(customers);
 };
 /**
  * GET /customers returns list of customers available. If there are any filters passed with query, then apply them too.
@@ -52,7 +54,7 @@ router.get('/:id', (req, res) => {
   if (isNaN(req.params.id)) return res.sendStatus(400);
   customerStore
     .get(req.params.id)
-    .then(({ rows }) => handleResponse(res, rows))
+    .then(({ rows }) => handleResponse(res, rows[0]))
     .catch(err => handleError(err, res));
 });
 module.exports = router;

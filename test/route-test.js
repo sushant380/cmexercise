@@ -78,8 +78,7 @@ describe('Test APIs', () => {
       .get('/customers/1')
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.have.property('customers');
-        res.body.customers[0].should.have.property('id').equal(10);
+        res.body.should.have.property('id').equal(10);
         done();
       });
   });
