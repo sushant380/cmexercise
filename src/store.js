@@ -14,7 +14,11 @@ const fromStore = row => {
     country
   };
 };
-
+/**
+ * Use query param to filter the results
+ * @param {String} query
+ * @param {Array} filters
+ */
 const applyFilters = (query, filters) => {
   filters.forEach(filter => {
     query = query.filter(filter.field, filter.operator, filter.value);

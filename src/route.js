@@ -11,8 +11,21 @@ const extractFilters = params =>
     .filter(key => key !== 'limit' && key !== 'pageToken')
     .map(key => ({ field: key, operator: '=', value: params[key] }));
 
+/**
+ * Handle error messages
+ * @param {String} err Error code
+ * @param {*} res Response object
+ */
+
 const handleError = (err, res) =>
   err === '404' ? res.sendStatus(404) : res.sendStatus(500);
+
+/**
+ * Reponse handler method
+ * @param {*} res response object
+ * @param {Array} customers List of customers
+ * @param {String} pageToken next page toke
+ */
 
 const handleResponse = (res, customers, pageToken) => {
   res.json({ customers, pageToken });
