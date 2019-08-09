@@ -56,7 +56,10 @@ const get = id => {
   const query = ds.createQuery([kind]).filter('id', '=', parseInt(id, 10));
   return ds
     .runQuery(query)
-    .then(result => Promise.resolve({ rows: result[0].map(fromStore) }))
+    .then(result => result[0].map(fromStore))
+    .then(rs =>
+      rs.length ? Promise.resolve({ rows: rs }) : Promise.reject('404')
+    )
     .catch(err => Promise.reject(err));
 };
 
