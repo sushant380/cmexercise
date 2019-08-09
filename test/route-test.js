@@ -5,37 +5,42 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon').createSandbox();
 chai.use(chaiHttp);
 chai.should();
-let app;
+let app, getll, uploaddata, getmethod;
 describe('Test APIs', () => {
   const customer = { id: 10, name: 'sushanttest', country: 'Sweden' };
-  before(() => {
+  beforeEach(() => {
     sinon.stub(CustomerStore, 'uploaddata').callsFake((data, callback) => {
       callback(null);
     });
-    sinon
+    getll = sinon
       .stub(CustomerStore, 'getall')
-      .callsFake((data1, data2, data3, callback) => {
+      .callsFake((data1, data2, data3) => {
         if (data1.length > 0) {
           if (data1[0].field === 'country' && data1[0].value === 'Sweden') {
-            callback(null, [customer], 'sometoken');
+            return Promise.resolve({ rows: [customer], pageToken: 'sometoke' });
           }
           if (data1[0].field === 'country' && data1[0].value === 'Norway') {
-            callback(null, [], 'sometoken');
+            return Promise.resolve({ rows: [], pageToken: 'sometoke' });
           }
         } else {
-          callback(null, [customer], 'sometoken');
+          return Promise.resolve({ rows: [], pageToken: 'sometoke' });
         }
       });
     sinon.stub(CustomerStore, 'get').callsFake((data1, callback) => {
       if (parseInt(data1, 10) === 1) {
-        callback(null, customer);
+        return Promise.resolve({ rows: [customer] });
       } else if (data1 === '2') {
-        callback('404', null);
+        return Promise.reject('404');
+        // callback('404', null);
       } else if (data1 === '3') {
-        callback('some error', null);
+        return Promise.reject();
+        // callback('some error', null);
       }
     });
     app = require('../src/app');
+  });
+  afterEach(() => {
+    sinon.restore();
   });
 
   it('should return list of customers', done => {
@@ -78,7 +83,8 @@ describe('Test APIs', () => {
       .get('/customers/1')
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.have.property('id').equal(10);
+        res.body.should.have.property('customers');
+        res.body.customers[0].should.have.property('id').equal(10);
         done();
       });
   });
@@ -91,7 +97,7 @@ describe('Test APIs', () => {
         done();
       });
   });
-  it('should return 505 for other errors', done => {
+  it('should return 500 for other errors', done => {
     chai
       .request(app)
       .get('/customers/3')

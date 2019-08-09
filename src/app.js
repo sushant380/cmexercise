@@ -1,7 +1,7 @@
 const createError = require('http-errors');
 const express = require('express');
 const http = require('http');
-const cookieParser = require('cookie-parser');
+var CustomerStore = require('./store');
 const customerRouter = require('./route');
 const initializeDb = require('./db');
 const port = 8080;
@@ -10,8 +10,6 @@ initializeDb(db => {
   app.set('port', port);
 
   app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
-  app.use(cookieParser());
   app.use('/customers', customerRouter);
   app.use('/', (req, res) => {
     res.redirect('/customers');
@@ -33,7 +31,7 @@ initializeDb(db => {
    * Listen on provided port, on all network interfaces.
    */
 
-  app.listen(port);
+  app.listen(process.env.PORT || port);
 });
 
 module.exports = app;

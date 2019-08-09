@@ -14,6 +14,13 @@ const fromStore = row => {
     country
   };
 };
+
+const applyFilters = (query, filters) => {
+  filters.forEach(filter => {
+    query = query.filter(filter.field, filter.operator, filter.value);
+  });
+  return query;
+};
 /**
  * Get all customers based on filters.
  * @param {Array} filters filters to be applied.
@@ -21,48 +28,51 @@ const fromStore = row => {
  * @param {String} token next page token if there is any else false
  * @param {Function} callback call back method to return the result.
  */
-const getall = (filters, limit, token, callback) => {
-  let query = ds
-    .createQuery([kind])
-    .limit(limit)
-    .start(token);
-  if (Array.isArray(filters)) {
-    filters.forEach(filter => {
-      query = query.filter(filter.field, filter.operator, filter.value);
-    });
-  }
-  ds.runQuery(query, (err, rows, nextQ) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    const hasMore =
-      nextQ.moreResults !== Datastore.NO_MORE_RESULTS ? nextQ.endCursor : false;
-    callback(null, rows.map(fromStore), hasMore);
-  });
+const getall = (filters, limit, token) => {
+  const query = applyFilters(
+    ds
+      .createQuery([kind])
+      .limit(limit)
+      .start(token),
+    filters
+  );
+  return ds
+    .runQuery(query)
+    .then(result =>
+      Promise.resolve({ rows: result[0].map(fromStore), pageCursor: result[1] })
+    )
+    .catch(err => Promise.reject(err));
+  // ds.runQuery(query)
+  //   .then(({ rows, info }) => {
+  //     callback(
+  //       null,
+  //       rows.map(fromStore),
+  //       info.moreResults !== Datastore.NO_MORE_RESULTS ? info.endCursor : false
+  //     );
+  //   })
+  //   .catch(err => callback(err));
 };
 /**
  * Get customer from DB based on ID
  * @param {Number} id numeric customer id
  * @param {Function} callback call back function to return the result.
  */
-const get = (id, callback) => {
+const get = id => {
   const query = ds.createQuery([kind]).filter('id', '=', parseInt(id, 10));
-  ds.runQuery(query, (err, rows, nextQ) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    const converted = rows.map(fromStore);
-    const customer = converted.length ? converted[0] : null;
-    if (!customer) {
-      callback('404');
-      return;
-    }
-    callback(null, customer);
-  });
+  return ds
+    .runQuery(query)
+    .then(result => Promise.resolve({ rows: result[0].map(fromStore) }))
+    .catch(err => Promise.reject(err));
 };
 
+const upload = (data, callback) => {
+  const key = ds.key('Customer');
+  const updated = data.map(record => {
+    record.key = key;
+    return record;
+  });
+  ds.save(updated, callback);
+};
 /**
  * Dummy data to be uploaded into DB for testing.
  * @param {Array} data data
@@ -70,16 +80,9 @@ const get = (id, callback) => {
  */
 const uploaddata = (data, callback) => {
   const query = ds.createQuery([kind]).limit(1);
-  ds.runQuery(query, (err, rows, nextQ) => {
-    if (err || (rows && rows.length == 0)) {
-      const key = ds.key('Customer');
-      const updated = data.map(record => {
-        record.key = key;
-        return record;
-      });
-      ds.save(updated, callback);
-    }
-  });
+  ds.runQuery(query)
+    .then(result => result[0].length === 0 && upload(data, callback))
+    .catch(err => upload(data, callback));
 };
 module.exports = {
   getall,
