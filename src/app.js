@@ -1,7 +1,6 @@
 const createError = require('http-errors');
 const express = require('express');
 const http = require('http');
-var CustomerStore = require('./store');
 const customerRouter = require('./route');
 const initializeDb = require('./db');
 const port = 8080;
