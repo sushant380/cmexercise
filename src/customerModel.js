@@ -5,57 +5,52 @@ const kind = 'Customer';
  * Convert db records to general format.
  * @param {*} row DB record.
  */
-function fromStore(row) {
-  return {
-    id: row.id,
-    name: row.name,
-    age: row.age,
-    country: row.country
-  };
+function fromStore(rows) {
+  return rows.map(function(row) {
+    return {
+      id: row.id,
+      name: row.name,
+      age: row.age,
+      country: row.country
+    };
+  });
 }
 
 /**
  * Get all customers based on filters.
- * @param {Array} filters filters to be applied.
  * @param {Number} limit number of records
  * @param {String} token next page token if there is any else false
- * @return {Promise} return promise of customers else error
+ * @param {Function} callback function to return the result.
  */
-function getAllCustomers(limit, token) {
+function getAllCustomers(limit, token, callback) {
   const query = ds
     .createQuery([kind])
     .limit(limit)
     .start(token);
-  return ds
-    .runQuery(query)
-    .then(function(result) {
-      return Promise.resolve({
-        rows: result[0].map(fromStore),
-        pageToken: result[1]
-      });
-    })
-    .catch(function(err) {
-      return Promise.reject(err);
-    });
+  return ds.runQuery(query, function(err, customers, queryInfo) {
+    if (err) {
+      callback(err);
+    } else {
+      const formattedResult = fromStore(customers);
+      callback(null, formattedResult, queryInfo.endCursor);
+    }
+  });
 }
 /**
  * Get customer from DB based on ID
  * @param {Number} id numeric customer id
- * @return {Promise} returns promise of customer data else error
+ * @param {Function} callback function to return the result
  */
-function getCustomerById(id) {
+function getCustomerById(id, callback) {
   const query = ds.createQuery([kind]).filter('id', '=', parseInt(id, 10));
-  return ds
-    .runQuery(query)
-    .then(function(result) {
-      return result[0].map(fromStore);
-    })
-    .then(function(rs) {
-      return rs.length ? Promise.resolve({ rows: rs }) : Promise.reject('404');
-    })
-    .catch(function(err) {
-      return Promise.reject(err);
-    });
+  return ds.runQuery(query, function(err, customers) {
+    if (err) {
+      callback(err);
+    } else {
+      const formattedResult = fromStore(customers);
+      callback(null, formattedResult);
+    }
+  });
 }
 
 module.exports = {

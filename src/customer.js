@@ -16,28 +16,29 @@ function handleResponse(res, customers, pageToken) {
  * example. /customers
  */
 router.get('/', function(req, res) {
-  customerStore
-    .getAllCustomers(req.query.limit || 10, req.query.pageToken)
-    .then(function(result) {
-      return handleResponse(res, result.rows, result.pageToken);
-    })
-    .catch(function(err) {
-      return handleError(err, res);
-    });
+  customerStore.getAllCustomers(
+    req.query.limit || 10,
+    req.query.pageToken,
+    function(err, result, token) {
+      err ? handleError(err, res) : handleResponse(res, customers, token);
+    }
+  );
 });
 /**
  * GET /:id retrive customer based on ID passed on.
  */
 router.get('/:id', function(req, res) {
-  if (isNaN(req.params.id)) return res.sendStatus(400);
-
-  customerStore
-    .getCustomerById(req.params.id)
-    .then(function(result) {
-      return handleResponse(res, result.rows[0]);
-    })
-    .catch(function(err) {
-      return handleError(err, res);
-    });
+  if (isNaN(req.params.id)) {
+    return res.sendStatus(400);
+  }
+  customerStore.getCustomerById(req.params.id, function(err, customers) {
+    if (err) {
+      handleError(err, res);
+    } else {
+      customers.length > 0
+        ? handleResponse(res, customers[0], null)
+        : handleError('404', res);
+    }
+  });
 });
 module.exports = router;
