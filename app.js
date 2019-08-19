@@ -1,7 +1,7 @@
 const createError = require('http-errors');
 const express = require('express');
 const http = require('http');
-const customerRouter = require('./src/route');
+const customerRouter = require('./src/customer');
 const port = 8080;
 const app = express();
 app.set('port', port);
