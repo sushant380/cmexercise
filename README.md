@@ -6,9 +6,6 @@ This is example implemented using [Express.JS](https://expressjs.com/de/) and No
 
 - Express JS
 - GCP Datastore
-- Chai
-- Mocha
-- Sinon
 - REST API
 
 ## How to use
@@ -51,9 +48,3 @@ The server is now running on `http://{yourprojectid}.appspot.com`. You can send 
 
 - `/customers`: Fetch all customer entities stored in DB.
 - `/customers/:id`: Fetch customer entity by its `id`. e.g. `/customers/1`
-
-### 5. Test
-
-```
-npm test
-```
