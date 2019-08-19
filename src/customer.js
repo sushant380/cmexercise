@@ -12,7 +12,7 @@ function handleResponse(res, customers, pageToken) {
     : res.json(customers);
 }
 /**
- * GET /customers returns list of customers available. If there are any filters passed with query, then apply them too.
+ * GET /customers returns list of customers available.
  * example. /customers
  */
 router.get('/', function(req, res) {

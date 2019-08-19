@@ -3,7 +3,6 @@ const ds = new Datastore();
 const kind = 'Customer';
 /**
  * Convert db records to general format.
- * @param {*} row DB record.
  */
 function fromStore(rows) {
   return rows.map(function(row) {
@@ -18,9 +17,6 @@ function fromStore(rows) {
 
 /**
  * Get all customers based on filters.
- * @param {Number} limit number of records
- * @param {String} token next page token if there is any else false
- * @param {Function} callback function to return the result.
  */
 function getAllCustomers(limit, token, callback) {
   const query = ds
@@ -38,8 +34,6 @@ function getAllCustomers(limit, token, callback) {
 }
 /**
  * Get customer from DB based on ID
- * @param {Number} id numeric customer id
- * @param {Function} callback function to return the result
  */
 function getCustomerById(id, callback) {
   const query = ds.createQuery([kind]).filter('id', '=', parseInt(id, 10));
