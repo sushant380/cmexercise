@@ -19,7 +19,7 @@ router.get('/', function(req, res) {
   customerModel.getAllCustomers(
     req.query.limit || 10,
     req.query.pageToken,
-    function(err, result, token) {
+    function(err, customers, token) {
       err ? handleError(err, res) : handleResponse(res, customers, token);
     }
   );
