@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const customerStore = require('./customerModel');
+const customerModel = require('./customerModel');
 
 function handleError(err, res) {
   return err === '404' ? res.sendStatus(404) : res.sendStatus(500);
@@ -16,7 +16,7 @@ function handleResponse(res, customers, pageToken) {
  * example. /customers
  */
 router.get('/', function(req, res) {
-  customerStore.getAllCustomers(
+  customerModel.getAllCustomers(
     req.query.limit || 10,
     req.query.pageToken,
     function(err, result, token) {
@@ -31,7 +31,7 @@ router.get('/:id', function(req, res) {
   if (isNaN(req.params.id)) {
     return res.sendStatus(400);
   }
-  customerStore.getCustomerById(req.params.id, function(err, customers) {
+  customerModel.getCustomerById(req.params.id, function(err, customers) {
     if (err) {
       handleError(err, res);
     } else {
