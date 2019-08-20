@@ -2,43 +2,23 @@ const express = require('express');
 const router = express.Router();
 const customerModel = require('./customerModel');
 
-function handleError(err, res) {
-  return err === '404' ? res.sendStatus(404) : res.sendStatus(500);
-}
-
-function handleResponse(res, customers, pageToken) {
-  return Array.isArray(customers)
-    ? res.json({ customers, pageToken })
-    : res.json(customers);
-}
 /**
  * GET /customers returns list of customers available.
  * example. /customers
  */
 router.get('/', function(req, res) {
-  customerModel.getAllCustomers(
-    req.query.limit || 10,
-    req.query.pageToken,
-    function(err, customers, token) {
-      err ? handleError(err, res) : handleResponse(res, customers, token);
-    }
-  );
+  customerModel.getAllCustomers(function(err, customers) {
+    err ? res.sendStatus(500) : res.json({ customers });
+  });
 });
 /**
- * GET /:id retrive customer based on ID passed on.
+ * GET /customers/:id retrive customer based on ID passed on.
  */
 router.get('/:id', function(req, res) {
-  if (isNaN(req.params.id)) {
-    return res.sendStatus(400);
-  }
   customerModel.getCustomerById(req.params.id, function(err, customers) {
-    if (err) {
-      handleError(err, res);
-    } else {
-      customers.length > 0
-        ? handleResponse(res, customers[0], null)
-        : handleError('404', res);
-    }
+    err
+      ? res.sendStatus(500)
+      : res.status(customers.length > 0 ? 200 : 404).json(customers[0]);
   });
 });
 module.exports = router;
